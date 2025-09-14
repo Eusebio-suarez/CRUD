@@ -5,14 +5,19 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.StreamingHttpOutputMessage;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.springBoot.CRUD.dto.response.UsuarioActualizadoResponseDTO;
 import com.springBoot.CRUD.dto.response.UsuarioResponseDTO;
 import com.springBoot.CRUD.dto.resquest.UsuarioRequestDTO;
+import com.springBoot.CRUD.repository.UsuarioRepository;
 import com.springBoot.CRUD.services.UsuarioService;
 import com.springBoot.utils.ApiResponse;
 import com.springBoot.utils.UsuarioException;
@@ -75,6 +80,52 @@ public class UsuarioController {
                 .body(ApiResponse.builder()
                     .ok(false)
                     .mensaje("error inesperado: "+ e.getMessage())
+                    .data(null)
+                    .build()
+                );
+        }
+    }
+
+    //endpoint para actualizar un usuario
+    @PutMapping("/actualizar")
+    public ResponseEntity<ApiResponse<?>> actualizarUsuario(@Valid @RequestParam Long id,@RequestBody UsuarioRequestDTO usuarioRequestDTO){
+        try{
+            //actualizar el usuario 
+            UsuarioActualizadoResponseDTO usuarioActualizado = usuarioService.actualizarUsuario(id, usuarioRequestDTO);
+            System.out.println(usuarioRequestDTO);
+
+            //validar que el usuario se haya creado correctamente
+            if(usuarioActualizado !=null){
+                return ResponseEntity.status(HttpStatus.OK)
+                    .body(ApiResponse.builder()
+                        .ok(true)
+                        .mensaje("usuario actualizado con exito")
+                        .data(usuarioActualizado)
+                        .build()
+                    );
+            }
+            else{
+                throw new UsuarioException("error al actualizar el usuario");
+            }
+
+        }
+
+        //capturar excepciones del usuario
+        catch(UsuarioException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.builder()
+                    .ok(false)
+                    .mensaje("no se pudo actualizar el usuario :"+e.getMessage())
+                    .data(null)
+                    .build()
+                );
+        }
+        //capturar la excepciones inesperadas
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.builder()
+                    .ok(false)
+                    .mensaje("error inesperado :"+e.getMessage())
                     .data(null)
                     .build()
                 );

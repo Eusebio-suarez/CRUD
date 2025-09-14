@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.springBoot.CRUD.dto.response.UsuarioActualizadoResponseDTO;
 import com.springBoot.CRUD.dto.response.UsuarioResponseDTO;
 import com.springBoot.CRUD.dto.resquest.UsuarioRequestDTO;
 import com.springBoot.CRUD.entity.Usuario;
@@ -40,7 +41,7 @@ public class UsuarioService {
             .build();
     } 
 
-    //servicio para obtener todos los usuarios de la base de datos
+    //obtener todos los usuarios de la base de datos
     public List<UsuarioResponseDTO> obtenerUsuarios() {
         return usuarioRepository.findAll() // Obtiene todos los usuarios de la BD
                 .stream() // Convierte la lista en un Stream para transformarla
@@ -54,5 +55,30 @@ public class UsuarioService {
                         .build())
                 .collect(Collectors.toList()); 
                 // Recolecta todos los DTOs en una lista
+    }
+
+    //actualizar un usuario
+    public UsuarioActualizadoResponseDTO actualizarUsuario(Long id, UsuarioRequestDTO usuarioRequestDTO){
+        
+        //mapear el usuariodto a un usuario pasando el id
+        Usuario usuario = Usuario.builder()
+            .id(id)
+            .nombre(usuarioRequestDTO.getNombre())
+            .correo(usuarioRequestDTO.getCorreo())
+            .contraseña(usuarioRequestDTO.getContraseña())
+            .telefono(usuarioRequestDTO.getTelefono())
+            .build();
+            
+        //actualizar el usuario en la db    
+        Usuario usuarioActualizado = usuarioRepository.save(usuario);  
+        
+        return UsuarioActualizadoResponseDTO.builder()
+            .id(usuarioActualizado.getId())
+            .nombre(usuarioActualizado.getNombre())
+            .correo(usuarioActualizado.getCorreo())
+            .telefono(usuarioActualizado.getTelefono())
+            .fechaActualizacion(LocalDateTime.now())
+            .build();
+            
     }
 }

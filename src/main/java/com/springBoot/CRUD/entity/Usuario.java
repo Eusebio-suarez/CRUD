@@ -2,6 +2,8 @@ package com.springBoot.CRUD.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -53,6 +55,7 @@ public class Usuario {
     @Column(name="fecha_creacion",updatable=false)//cuando se actualiza el registro este campo mantien su valor
     private LocalDateTime fechaCreaccion;
 
+    @UpdateTimestamp
     @Column(name="fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 }
