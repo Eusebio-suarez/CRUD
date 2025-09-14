@@ -11,11 +11,17 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity//definir que es una entidad
 @Table(name="usuarios") // nombre de la tabla en la base de datos
 @Data //getter y setters cn lombuk
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Usuario {
     @Id//id clave primaria de la entidad
     @GeneratedValue(strategy= GenerationType.IDENTITY)//la base de datos genera el id
@@ -27,7 +33,7 @@ public class Usuario {
     @Size(min=3,max=20, message="el nombre debe tebner minimo 3 y maximo 20 caracteres")
     private String nombre;
 
-    @Column(name="correo")
+    @Column(name="correo",unique=true)
     @Email//valida que tenga un formato de correo
     @NotBlank//valida que el campo no este vacio
     private String correo;
