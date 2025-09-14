@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.StreamingHttpOutputMessage;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springBoot.CRUD.dto.response.UsuarioActualizadoResponseDTO;
+import com.springBoot.CRUD.dto.response.UsuarioEliminadoDTO;
 import com.springBoot.CRUD.dto.response.UsuarioResponseDTO;
 import com.springBoot.CRUD.dto.resquest.UsuarioRequestDTO;
 import com.springBoot.CRUD.repository.UsuarioRepository;
@@ -23,6 +25,7 @@ import com.springBoot.utils.ApiResponse;
 import com.springBoot.utils.UsuarioException;
 
 import jakarta.validation.Valid;
+import jdk.jshell.spi.ExecutionControl;
 
 @RestController // definir esta calse como un controlador
 @RequestMapping("/usuarios") //ruta inicial del controlador
@@ -121,6 +124,48 @@ public class UsuarioController {
                 );
         }
         //capturar la excepciones inesperadas
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.builder()
+                    .ok(false)
+                    .mensaje("error inesperado :"+e.getMessage())
+                    .data(null)
+                    .build()
+                );
+        }
+    }
+
+    //endpoint para eliminar un usuario por id
+    @DeleteMapping("/eliminar")
+    public ResponseEntity<ApiResponse<?>> eliminarUsuario(@RequestParam Long id){
+
+        try{
+            //llamar a el servicio
+            UsuarioEliminadoDTO usuarioEliminado = usuarioService.eliminarUsuario(id);
+
+            if(usuarioEliminado != null){
+                return ResponseEntity.status(HttpStatus.OK)
+                    .body(ApiResponse.builder()
+                        .ok(true)
+                        .mensaje("usuario eliminado correctamente")
+                        .data(usuarioEliminado)
+                        .build()
+                    );
+            }
+            else{
+                throw new UsuarioException("no se pudo eliminar el usuario");
+            }
+
+        }
+        catch(UsuarioException ue){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.builder()
+                    .ok(false)
+                    .mensaje("error al eliminar el usuario:"+ue.getMessage())
+                    .data(null)
+                    .build()
+                );
+        }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.builder()

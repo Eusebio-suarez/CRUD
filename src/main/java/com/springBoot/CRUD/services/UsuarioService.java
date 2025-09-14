@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.springBoot.CRUD.dto.response.UsuarioActualizadoResponseDTO;
+import com.springBoot.CRUD.dto.response.UsuarioEliminadoDTO;
 import com.springBoot.CRUD.dto.response.UsuarioResponseDTO;
 import com.springBoot.CRUD.dto.resquest.UsuarioRequestDTO;
 import com.springBoot.CRUD.entity.Usuario;
 import com.springBoot.CRUD.repository.UsuarioRepository;
+import com.springBoot.utils.UsuarioException;
 
 @Service//definir la clase como un servicio
 public class UsuarioService {
@@ -80,5 +82,21 @@ public class UsuarioService {
             .fechaActualizacion(LocalDateTime.now())
             .build();
             
+    }
+
+    //metodo para eliminar un usuario por id
+    public UsuarioEliminadoDTO eliminarUsuario(Long id){
+        //buscar el usuario a eliminar
+        Usuario usuarioEliminado = usuarioRepository.findById(id)
+            .orElseThrow(()-> new UsuarioException("no se encontro el usuario con id: "+id));
+
+        //eliminar el usuario d ela db
+        usuarioRepository.deleteById(id);
+        
+        return UsuarioEliminadoDTO.builder()
+                .id(usuarioEliminado.getId())
+                .correo(usuarioEliminado.getCorreo())
+                .build();
+    
     }
 }
